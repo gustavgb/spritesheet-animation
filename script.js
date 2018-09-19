@@ -11,6 +11,9 @@ var sprite = null
 var speed = 1
 var scale = 1
 var imageScaleFactor = 1
+var chosenBG = 0
+var bglist = ['#ddd', '#aaa', '#555', '#da5', '#5ad', '#a5d', '#ad5']
+var source
 
 ctx.mozImageSmoothingEnabled = false;
 ctx.webkitImageSmoothingEnabled = false;
@@ -23,27 +26,31 @@ function changeFile(files) {
 
   reader.addEventListener('load', function () {
     preview.src = reader.result
-    preview.onload = function () {
-      applyOptions({
-        fileWidth: preview.width,
-        fileHeight: preview.height
-      })
-    }
 
-    var img = new Image()
-    img.src = reader.result
-    img.onload = function () {
-      imageScaleFactor = Math.ceil(1000 / img.height)
-      renderUpscaled(img, imageScaleFactor)
-
-      applyOptions({
-        sprite: document.getElementById('upscaled'),
-        imageScaleFactor: imageScaleFactor
-      })
-    }
+    applyImage(reader.result)
   })
 
   reader.readAsDataURL(files[0])
+}
+
+function applyImage(source, callback) {
+  var img = new Image()
+  img.src = source
+  img.onload = function () {
+    imageScaleFactor = Math.ceil(1000 / img.height)
+    renderUpscaled(img, imageScaleFactor)
+    applyOptions({
+      fileWidth: img.width,
+      fileHeight: img.height,
+      source: source,
+      sprite: document.getElementById('upscaled'),
+      imageScaleFactor: imageScaleFactor
+    })
+
+    if (typeof callback === 'function') {
+      callback();
+    }
+  }
 }
 
 function renderUpscaled(sourceImage, factor) {
@@ -135,13 +142,20 @@ function applyOptions(options) {
 
     imageScaleFactor = options.imageScaleFactor
   }
+
+  if (options.source) {
+    console.log('Applying source ' + options.source)
+
+    source = options.source
+  }
 }
 
 function validateOptions () {
   if (
     sprite !== null &&
     spriteWidth !== null &&
-    spriteHeight !== null
+    spriteHeight !== null &&
+    fileWidth % spriteWidth === 0
   ) {
     return true
   }
@@ -166,6 +180,8 @@ function playAnimation() {
     running = true
 
     renderNextFrame()
+  } else {
+    alert("Something is wrong!")
   }
 }
 
@@ -174,7 +190,7 @@ function renderNextFrame() {
     setTimeout(renderNextFrame, (1000 / frames) / speed)
   }
 
-  ctx.fillStyle = '#aaa'
+  ctx.fillStyle = bglist[chosenBG]
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
   ctx.drawImage(
@@ -205,15 +221,15 @@ function prevFrame() {
   if (frame < 0) {
     frame = frames - 1
   }
-  renderNextFrame()
+  if (!running) renderNextFrame()
 }
 
 function nextFrame() {
   frame++;
-  if (frame > frames) {
+  if (frame >= frames) {
     frame = 0
   }
-  renderNextFrame()
+  if (!running) renderNextFrame()
 }
 
 function togglePlay() {
@@ -228,6 +244,60 @@ function togglePlay() {
 
 function reset() {
   if (confirm('Really reload?')) {
+    location.hash = ''
     location.reload()
   }
 }
+
+function changeBG() {
+  chosenBG++
+  if (chosenBG >= bglist.length) {
+    chosenBG = 0
+  }
+
+  return bglist[chosenBG]
+}
+
+function packShared() {
+  var bundle = btoa(JSON.stringify({
+    chosenBG: chosenBG,
+    spriteWidth: spriteWidth,
+    spriteHeight: spriteHeight,
+    speed: speed,
+    source: source
+  }))
+  
+  document.getElementById('sharelink').value = location.href.split('#')[0] + '#' + bundle
+  location.hash = bundle
+}
+
+function loadShared(bundle) {
+  var extract = JSON.parse(atob(bundle))
+
+  applyOptions({
+    width: extract.spriteWidth,
+    height: extract.spriteHeight,
+    speed: extract.speed
+  })
+
+  chosenBG = extract.chosenBG
+
+  document.getElementById('option-width').value = extract.spriteWidth
+  document.getElementById('option-height').value = extract.spriteHeight
+  document.getElementById('option-speed').value = extract.speed
+
+  applyImage(extract.source, playAnimation)
+}
+
+window.addEventListener('load', function load() {
+  window.removeEventListener('load', load)
+
+  if (location.hash) {
+    try {
+      loadShared(location.hash.substr(1))
+      console.log('Found bundle')
+    } catch (e) {
+      console.log('No bundle loaded')
+    }
+  }
+})

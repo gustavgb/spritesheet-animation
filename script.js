@@ -286,6 +286,7 @@ function loadShared(bundle) {
   document.getElementById('option-height').value = extract.spriteHeight
   document.getElementById('option-speed').value = extract.speed
 
+  document.getElementById('preview').src = extract.source
   applyImage(extract.source, playAnimation)
 }
 

@@ -254,8 +254,8 @@ function changeBG() {
   if (chosenBG >= bglist.length) {
     chosenBG = 0
   }
-
-  return bglist[chosenBG]
+  
+  if (!running) renderNextFrame();
 }
 
 function packShared() {

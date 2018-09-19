@@ -1,0 +1,53 @@
+#animation-container {
+  display: none;
+}
+
+html, body {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  font-family: sans-serif;
+  font-size: 0.8rem;
+  box-sizing: border-box;
+}
+
+.box {
+  padding: 20px;
+  background-color: rgb(125, 178, 199);
+  margin: 1%;
+  border-radius: 5px;
+  width: 98%;
+  float: left;
+}
+
+.section {
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 1.2rem;
+}
+
+.hidden {
+  left: -99999999;
+  position: absolute;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+}
+
+.preview-container {
+  max-width: 60vw;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.half {
+  width: 48%;
+  float: left;
+}

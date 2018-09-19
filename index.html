@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title>Sprite sheet animation previewer</title>
+
+    <link rel="stylesheet" href="styles.css" type="text/css" />
+  </head>
+
+  <body>
+    <canvas id="source" class="hidden"></canvas>
+    <canvas id="upscaled" class="hidden"></canvas>
+
+    <div class="box">
+      <h1>Step 1: Select sprite sheet file</h1>
+      <input type="file" onchange="changeFile(this.files)" id="sprite" name="sprite" accept="image/png, image/jpeg" />
+
+      <div class="preview-container">
+        <img id="preview" />
+      </div>
+    </div>
+
+    <div class="box half">
+      <h1>Step 2: Select size of each sprite</h1>
+
+      <div class="section">
+        Width:
+        <input class="option" type="number" step="1" min="1" onfocus="this.select();" onchange="applyOptions({ width: this.value })" /> px
+      </div>
+      <div class="section">
+        Height:
+        <input class="option"  type="number" step="1" min="1" onfocus="this.select();" onchange="applyOptions({ height: this.value })" /> px
+      </div>
+
+    </div>
+
+    <div class="box half">
+      <h1>Step 3: Set animation speed</h1>
+
+      <input type="number" onchange="applyOptions({ speed: this.value })" onfocus="this.select()" value="1" step="0.05" /> second
+    </div>
+
+    <div class="box">
+      <h1>Step 4: Go!</h1>
+
+      <input id="preview-button" type="button" onclick="playAnimation()" value="Preview animation" />
+
+      <div id="animation-container">
+        <div class="toolbox">
+          <input type="button" value="Prev frame" onclick="prevFrame()" />
+          <input type="button" value="Play/pause" onclick="togglePlay()" />
+          <input type="button" value="Next frame" onclick="nextFrame()" />
+          <span>Current frame <span id="currentFrame"></span></span>
+        </div>
+
+        <canvas id="animation"></canvas>
+      </div>
+    </div>
+
+    <div class="box">
+      <h1>Something wrong or want to start over?</h1>
+
+      <input type="button" onclick="reset()" value="Reload page" />
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

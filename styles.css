@@ -21,7 +21,7 @@ html, body {
 .box {
   padding: 20px;
   background-color: rgb(125, 178, 199);
-  margin: 1%;
+  margin: 5px 1%;
   border-radius: 5px;
   width: 98%;
   float: left;

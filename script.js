@@ -14,6 +14,7 @@ var imageScaleFactor = 1
 var chosenBG = 0
 var bglist = ['#ddd', '#aaa', '#555', '#da5', '#5ad', '#a5d', '#ad5']
 var source
+var loop = true
 
 ctx.mozImageSmoothingEnabled = false;
 ctx.webkitImageSmoothingEnabled = false;
@@ -179,6 +180,10 @@ function playAnimation() {
 
     running = true
 
+    if (!loop && frame >= frames - 1) {
+      frame = 0
+    }
+
     renderNextFrame()
   } else {
     alert("Something is wrong!")
@@ -206,12 +211,15 @@ function renderNextFrame() {
   )
 
   document.getElementById('currentFrame').innerText = frame + 1 + '/' + frames
-  
+
   if (running) {
     frame++
 
-    if (frame >= frames) {
+    if (frame >= frames && loop) {
       frame = 0
+    } else if (frame >= frames && !loop) {
+      togglePlay()
+      frame = frames - 1
     }
   }
 }
@@ -254,8 +262,18 @@ function changeBG() {
   if (chosenBG >= bglist.length) {
     chosenBG = 0
   }
-  
+
   if (!running) renderNextFrame();
+}
+
+function changeLooping () {
+  loop = !loop
+
+  if (loop) {
+    document.getElementById('loop-btn').value = 'Loop: On'
+  } else {
+    document.getElementById('loop-btn').value = 'Loop: Off'
+  }
 }
 
 function packShared() {
@@ -266,7 +284,7 @@ function packShared() {
     speed: speed,
     source: source
   }))
-  
+
   document.getElementById('sharelink').value = location.href.split('#')[0] + '#' + bundle
   location.hash = bundle
 }
